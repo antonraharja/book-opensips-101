@@ -1,4 +1,4 @@
-books
-=====
+OpenSIPS 101
+============
 
-My online writings
+Companion materials for OpenSIPS 101 training.
