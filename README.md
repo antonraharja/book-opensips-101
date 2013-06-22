@@ -1,7 +1,11 @@
 OpenSIPS 101
 ============
 
-Companion materials for OpenSIPS 101 training.
+This is a project of book writing. A companion materials for OpenSIPS 101 training.
 
-Content is in this project Wiki:
+Content is actually written in Wiki:
+
 https://github.com/antonraharja/book-opensips-101/wiki
+
+--
+Anton Raharja
