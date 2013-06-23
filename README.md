@@ -7,10 +7,10 @@ While this repo holds files and folders for the book, the content it self is act
 
 https://github.com/antonraharja/book-opensips-101/wiki
 
-You may download the content from:
+You may download the content from:<br>
 ```git clone git://github.com/antonraharja/book-opensips-101.wiki.git```
 
-And files used in various chapters:
+And files used in various chapters:<br>
 ```git clone git://github.com/antonraharja/book-opensips-101.git```
 
 
