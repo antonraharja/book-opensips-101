@@ -3,17 +3,12 @@ OpenSIPS 101
 
 This is a project of book writing. A companion materials for OpenSIPS 101 training.
 
-While this repo holds files and folders for the book, the content it self is actually written in Wiki:
+The book content is in folder ``content``.
 
-https://github.com/antonraharja/book-opensips-101/wiki
-
-You may download the content from:<br>
-```git clone git://github.com/antonraharja/book-opensips-101.wiki.git```
-
-And files used in various chapters:<br>
+You may get all content, files and folders by cloning this repo:<br>
 ```git clone git://github.com/antonraharja/book-opensips-101.git```
 
 
 --<br>
 Anton Raharja<br>
-http://www.antonraharja.web.id<br>
+http://www.antonraharja.com<br>
