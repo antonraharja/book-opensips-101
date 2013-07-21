@@ -1,0 +1,40 @@
+OpenSIPS 101
+
+This book project is a companion material for OpenSIPS 101 training.
+
+I hope this project will help to understand OpenSIPS installation and basic configuration.
+
+[[1.1. OpenSIPS.mediawiki]]<br>
+[[1.2. SIP Concept.mediawiki]]<br>
+
+[[2.1. Compile and Install OpenSIPS.mediawiki]]<br>
+[[2.2. First Time Configuration.mediawiki]]<br>
+[[2.3. First Time Running OpenSIPS.mediawiki]]<br>
+[[2.4. First Time Testing OpenSIPS.mediawiki]]<br>
+
+[[3.1. Debugging.mediawiki]]<br>
+[[3.2. SIP TLS Secure Calling.mediawiki]]<br>
+
+[[4.1. Basic Config File opensips.cfg.mediawiki]]<br>
+[[4.2. Database Tool opensipsdbctl.mediawiki]]<br>
+[[4.3. Subscriber Database.mediawiki]]<br>
+[[4.4. Subscriber Management.mediawiki]]<br>
+[[4.5. Authorize SIP Messages.mediawiki]]<br>
+[[4.6. Persistent User Location.mediawiki]]<br>
+[[4.7. Alias.mediawiki]]<br>
+
+[[5.1. GUI for OpenSIPS: SerMyAdmin.mediawiki]]<br>
+[[5.2. GUI for OpenSIPS: opensips-cp.mediawiki]]<br>
+[[5.3. CDRviewer for opensips cp.mediawiki]]<br>
+[[5.4. Accounting.mediawiki]]<br>
+[[5.5. Multi Domain Support.mediawiki]]<br>
+
+[[6.1. NAT Traversal.mediawiki]]<br>
+[[6.2. Dialplan.mediawiki]]<br>
+[[6.3. Access Control List (ACL).mediawiki]]<br>
+[[6.4. Asterisk as Media Gateway.mediawiki]]<br>
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>
