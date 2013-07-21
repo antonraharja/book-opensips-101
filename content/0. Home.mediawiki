@@ -23,9 +23,9 @@ I hope this project will help to understand OpenSIPS installation and basic conf
 [[4.6. Persistent User Location.mediawiki]]<br>
 [[4.7. Alias.mediawiki]]<br>
 
-[[5.1. GUI for OpenSIPS: SerMyAdmin.mediawiki]]<br>
-[[5.2. GUI for OpenSIPS: opensips-cp.mediawiki]]<br>
-[[5.3. CDRviewer for opensips cp.mediawiki]]<br>
+[[5.1. GUI for OpenSIPS SerMyAdmin.mediawiki]]<br>
+[[5.2. GUI for OpenSIPS opensips-cp.mediawiki]]<br>
+[[5.3. CDRviewer for opensips-cp.mediawiki]]<br>
 [[5.4. Accounting.mediawiki]]<br>
 [[5.5. Multi Domain Support.mediawiki]]<br>
 
