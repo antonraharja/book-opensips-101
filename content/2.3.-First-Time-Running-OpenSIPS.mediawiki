@@ -1,0 +1,44 @@
+Running OpenSIPS for the first time involving setting up init scripts and editing a few lines on it.
+
+Remember:
+* Our OpenSIPS source files are in /root/src/opensips/opensips-1.9.1-tls/
+* Our OpenSIPS config files are in /usr/local/etc/opensips/
+
+Setup init scripts:
+ cd /root/src/opensips/opensips-1.9.1-tls/packaging/debian/
+ cp opensips.init /etc/init.d/
+ chmod 755 /etc/init.d/opensips.init
+ cp opensips.default /etc/default/opensips
+ chmod 644 /etc/default/opensips
+ update-rc.d opensips.init defaults 99
+ groupadd opensips
+ useradd -M -s /usr/sbin/nologin -g opensips opensips
+
+Edit /etc/init.d/opensips.init, and change these parts:
+* search for ''PATH'' and add /usr/local/sbin to PATH. Eg: PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin
+* search for ''DAEMON'' and change ''DAEMON=/usr/sbin/opensips'' to ''DAEMON=/usr/local/sbin/opensips''
+* search for ''/etc/opensips/opensips.cfg'' and then change it to ''/usr/local/etc/opensips/opensips.cfg''
+
+Note:
+
+Following the steps on earlier page our OpenSIPS will have opensips binary installed in /usr/local/sbin/ and opensips.cfg in /usr/local/etc/opensips/.
+
+Configure init script by editing /etc/default/opensips. Simply change ''RUN_OPENSIPS=no'' to ''RUN_OPENSIPS=yes'', this will make /etc/init.d/opensips.init actually run OpenSIPS.
+
+Check OpenSIPS config file (that is /usr/local/etc/opensips/opensips.cfg) for configuration mismatched or compile issues (such as forgot to use TLS=1 on make modules):
+ opensips -c
+
+Star OpenSIPS:
+ /etc/init.d/opensips.init start
+
+Check whether OpenSIPS is running properly:
+ ps ax | grep opensips
+ netstat -lnptu | grep opensips
+ tail -f /var/log/syslog | grep opensips
+
+You should notice that OpenSIPS is running, bound to defined port(s) and the log should shown no error (ERR or CRITICAL).
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

@@ -1,0 +1,53 @@
+== Preface ==
+After installation you will have OpenSIPS configuration files in /usr/local/etc/opensips:
+ cd /usr/local/etc/opensips
+ ls -l
+
+These configuration files are working configurations, meaning you can use them immediately. But of course your OpenSIPS won't be secure and served only basic features.
+
+There are at least 3 config files for opensips you need to know:
+* opensips.cfg
+* opensipsctlrc
+* osipsconsolerc
+
+== 1. opensips.cfg ==
+
+This file served as the only OpenSIPS configuration files. Inside we need to define which IP and port we want our OpenSIPS to listen to, what modules it needs to load, what are modules activated parameters, how you want it to control each SIP requests and replies.
+
+Edit /usr/local/etc/opensips/opensips.cfg and scan the file for a while. Look for the only line contains a sentence '''CUSTOMIZE ME'''.
+
+Change the listen option to something like this:
+
+ listen=udp:192.168.56.45:5060
+
+Above option will get OpenSIPS to listen on IP 192.168.56.45 UDP port 5060. That IP is our OpenSIPS IP.
+
+If you need to enable TCP then you need to set ''disable_tcp'' to ''no'' and add more listen option.
+
+ disable_tcp=no
+ listen=tcp:192.168.56.45:5060
+
+Note:
+
+I suggest not to use 0.0.0.0 to bind to all interfaces on both udp or tcp, for now.
+
+== 2. opensipsctlrc ==
+
+This file will be used by opensipsctl, a script to manage OpenSIPS. This file also required by opensipsdbctl , another script just like opensipsctl, to manage databases including re-create OpenSIPS database.
+
+Note:
+
+No need to change anything now since we haven't introduce database for OpenSIPS.
+
+== 3. osipsconsolerc ==
+
+This file will be used by osipconsole to manage OpenSIPS.
+
+Note:
+
+No need to change anything now since we haven't introduce database for OpenSIPS.
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

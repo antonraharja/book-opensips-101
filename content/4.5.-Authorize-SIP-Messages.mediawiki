@@ -1,0 +1,54 @@
+Previously in [[4.3. Subscriber Database]] we have learnt how to enable authentication on SIP REGISTER.
+We use 2 script commands, ''www_authorize()'' and ''www_challenge()'', to challenge SIP UA for username and password.
+
+We should also challenge SIP UA for every SIP requests other than SIP REGISTER, such as a SIP INVITE or SIP MESSAGE.
+This is what we call ''Proxy Authorize''.
+
+Code snippet for proxy authorization:
+
+ if (!proxy_authorize("", "subscriber")) {
+         proxy_challenge("", "0");
+         exit;
+ }
+ if (!db_check_from()) {
+         sl_send_reply("403","Forbidden");
+ }
+ consume_credentials();
+
+Example use in '''Routing Logic''':
+
+ # if its not SIP REGISTER
+ # perhaps its SIP INVITE or SIP MESSAGE, then proxy authorize caller (from_uri)
+ if ( !(is_method("REGISTER")  ) ) {
+         if (from_uri==myself) {
+ 
+                 if (!proxy_authorize("", "subscriber")) {
+                         proxy_challenge("", "0");
+                         exit;
+                 }
+                 if (!db_check_from()) {
+                         sl_send_reply("403","Forbidden");
+                 }
+                 consume_credentials();
+ 
+         } else {
+                 # if we don't handle this callee (uri)
+                 if (!uri==myself) {
+                         send_reply("403","Relay forbidden");
+                         exit;
+                 }
+         }
+ }
+
+Verify opensips.cfg before starting or restarting OpenSIPS:
+ opensips -c
+
+Restart OpenSIPS:
+ /etc/init.d/opensips.init restart
+
+By now we should have a SIP server that is secure from unauthorized caller and unknown callee.
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

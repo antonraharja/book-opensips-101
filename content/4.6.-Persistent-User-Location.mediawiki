@@ -1,0 +1,29 @@
+By default subscriber (sometime referred as user) locations are saved in memory. That's not flexible to customize and also doesn't survive restarts.
+
+Update opensips.cfg and search for '''USeR LOCation module''' section on '''Modules Section'''. Update ''db_mode'' from 0 to 2 and add ''db_url'' parameter:
+ modparam("usrloc", "db_mode",   2)
+ modparam("usrloc", "db_url", "mysql://root:pwd@localhost/opensips")
+
+Above parameters will get usrloc module to save subscriber locations to database, thus make them persistent and survived on OpenSIPS restarts.
+
+Example use of usrloc in '''Modules Section''':
+
+ #### USeR LOCation module
+ loadmodule "usrloc.so"
+ modparam("usrloc", "nat_bflag", "NAT")
+ modparam("usrloc", "db_mode", 2)
+ modparam("usrloc", "db_url", "mysql://root:pwd@localhost/opensips")
+
+Verify opensips.cfg before starting or restarting OpenSIPS:
+ opensips -c
+
+Restart OpenSIPS:
+ /etc/init.d/opensips.init restart
+
+Re-register SIP UA and check whether or not the user location has been saved to database:
+ opensipsctl db show location
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

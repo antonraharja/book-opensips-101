@@ -1,0 +1,119 @@
+== Preface ==
+
+Secure call can be achieved by enabling [https://en.wikipedia.org/wiki/Transport_Layer_Security TLS]. Once implemented SIP UA can choose to use transport TLS instead of UDP or TCP. The advantage of choosing TLS is that the SIP traffic exchanged between SIP UA and OpenSIPS will be encrypted, meaning it will take a considerable amount of time and effort to read it without the encryption key, if not possible.
+
+Please note that ''the media it self will not be protected by this setup''. In order to also secure the media, SIP UA need to be configured to use '''mandatory''' [http://en.wikipedia.org/wiki/Secure_Real-time_Transport_Protocol SRTP]. That will force SIP UA to encrypt the media before transfer.
+
+Several free SIP UA examples known to work or provide TLS and SRTP:
+
+* [http://icanblink.com/ Blink]
+* [https://play.google.com/store/apps/details?id=com.csipsimple&hl=en CSipSimple]
+* [http://microsip.org.ua/ MicroSIP]
+* [http://minisip.org/ Minisip]
+* [http://sflphone.org/ SFLphone]
+
+To enable TLS support in OpenSIPS we need to follow these steps:
+
+# OpenSIPS and its modules compiled with option TLS=1
+# Create TLS certificates
+# Configure opensips.cfg with TLS options
+# Verify config and test
+
+We already done the first step on compile time, so we will start with step 2 in this chapter.
+
+== Step 2: Create TLS certificates ==
+
+Before we start please remember that our OpenSIPS is in '''/root/src/opensips/opensips-1.9.1-tls/''' and our installed OpenSIPS config files are in '''/usr/local/etc/opensips/'''.
+
+Copy example openssl certificates to /usr/local/etc/opensips/tls/:
+
+ cd /root/src/opensips/opensips-1.9.1-tls/
+ cp -rR etc/tls /usr/local/etc/opensips/
+
+Re-create local root Certificate Authority (CA). First we need to edit the ca.conf:
+
+ cd /usr/local/etc/opensips/tls/
+ vi ca.conf
+
+Look for '''Please update''' sentence somewhere in ca.conf, they are near the bottom of the file. Update certificates parameters to suit your setups. If possible the ''commonName'' parameter is unique.
+
+Save ca.conf and exit editor.
+
+Run this command to re-create root CA in /usr/local/etc/opensips/tls/rootCA/:
+
+ opensipsctl tls rootCA
+
+Continue the process creating certificates, now we need to create our server certificate:
+
+ cd /usr/local/etc/opensips/tls/
+ cp user.conf server.conf
+ vi server.conf
+
+Look for '''Please update''' sentence somewhere in server.conf, they are quite easy to find. Update certificates parameters to suit your setups. Make sure that ''commonName'' parameter is pointing to OpenSIPS server IP, or your domain name that will be use as OpenSIPS server IP.
+
+Run this command to create server certificate in /usr/local/etc/opensips/tls/server/:
+
+ opensipsctl tls userCERT server
+
+There will be 3 important files created, they are:
+
+* /usr/local/etc/opensips/tls/server/server-cert.pem
+* /usr/local/etc/opensips/tls/server/server-privkey.pem
+* /usr/local/etc/opensips/tls/server/server-calist.pem.
+
+== Step 3: Configure opensips.cfg with TLS options ==
+
+Edit /usr/local/etc/opensips/opensips.cfg and locate for option disable_tls. By default it should have sets disable_tls=yes, meaning TLS is disabled.
+
+Change disable_tls=yes to disable_tls=no and then paste below options:
+
+ disable_tls = no
+ listen = tls:192.168.56.45:5061
+ tls_verify_server = 1
+ tls_verify_client = 1
+ tls_require_client_certificate = 0
+ tls_method = TLSv1
+ tls_certificate = "/usr/local/etc/opensips/tls/server/server-cert.pem"
+ tls_private_key = "/usr/local/etc/opensips/tls/server/server-privkey.pem"
+ tls_ca_list = "/usr/local/etc/opensips/tls/server/server-calist.pem"
+
+Save the file.
+
+Please note that our OpenSIPS 101 in this exercise is '''192.168.56.45'''. You should change this IP to your real OpenSIPS IP.
+
+== Step 4: Verify config and test ==
+
+Verify your config:
+
+ opensips -c
+
+Restart OpenSIPS:
+
+ /etc/init.d/opensips.init restart
+
+Verify whether OpenSIPS is listening in port 5061:
+
+ netstat -lnptu | grep opensips
+
+Use server-calist.pem on client side, do not copy other files from /usr/local/etc/opensips/tls/server/.
+
+You can use SIP UA with TLS supports to test TLS connection to OpenSIPS. SIP UA such as Minisip and SFLphone in Linux or MicroSIP and Blink in Windows are good to use as they are free and easy to use.
+
+On SIP UA, if possible we should disable other protocol (sometime referred as transport) and make sure we have only select TLS. Use port 5061 instead of 5060 to connect to OpenSIPS using TLS.
+
+Some SIP UA do not have special feature to load certificates from its GUI. In this case you should import your server-calist.pem into your OS certificate repository (sometime referred as key store).
+
+Same goes to mobile devices such as Android phone or iPhone, you should load server-calist.pem into its certificate repository rather then to load it from mobile SIP UA GUI.
+
+Debugging SIP traffics over TLS on port 5061:
+
+ ngrep -p -q -W byline port 5061
+
+You should notice packets are captured but displayed as unreadable characters.
+
+Try to make calls in TLS mode, and also try with mandatory SRTP enabled.
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

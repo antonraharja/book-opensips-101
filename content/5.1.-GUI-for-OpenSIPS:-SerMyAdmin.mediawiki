@@ -1,0 +1,76 @@
+OpenSIPS has several handy tools to manage it, such as opensipsctl and osipconsole.
+
+Even better we can also use a nice web based Graphical User Interface (GUI) to manage it. In addition we can also build our own management application if we want to. It is considered relatively easy to build a management interface for OpenSIPS as everything can be managed in 2 ways: through database and fifo to unix socket.
+
+SerMyAdmin is the oldest GUI for OpenSIPS.
+
+URL: http://sourceforge.net/projects/sermyadmin/
+
+Download and extract SerMyAdmin:
+ cd /root/src/opensips
+ wget -c "http://downloads.sourceforge.net/project/sermyadmin/sermyadmin-install-2.0.1a.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fsermyadmin%2Ffiles%2F&ts=1371694750&use_mirror=nchc" -O sermyadmin-install-2.0.1a.tar.gz
+ tar -zxf sermyadmin-install-2.0.1a.tar.gz
+ ls
+
+Continue to installation. We have 2 choices to install SerMyAdmin.
+
+== Choice 1: Automatic install ==
+
+SerMyAdmin package contains an installer ''install.sh'', it is made only for specific conditions, they are:
+* Newly created OpenSIPS database (you have just ran opensipsdbctl create opensips). The database "opensips" is still empty.
+* You need sun-java6-jre which is not available in Ubuntu 12.04.1, but this is easily replaced by openjdk-6-jre
+
+When you have met requirements above, you can use ''install.sh'':
+ cd /root/src/opensips/sermyadmin-install
+ apt-get install openjdk-6-jre
+ ./install.sh
+
+Follow instructions from install.sh.
+
+== Choice 2: Manual install ==
+
+If you already have a working OpenSIPS, with subscribers data already exists in database, then you should follow below steps to install SerMyAdmin rather than to use automatic install using ''install.sh'':
+ cd /root/src/opensips/sermyadmin-install
+ apt-get install openjdk-6-jre
+ tar -zxf apache-tomcat-6.0.16.tar.gz -C /usr/local/
+ mv /usr/local/apache-tomcat-6.0.16 /usr/local/tomcat6
+ cp sermyadmin-2.0.1.war /usr/local/tomcat6/webapps/sermyadmin.war
+ cp context.xml /usr/local/tomcat6/conf/
+ cp script/tomcat6 /etc/init.d/
+ update-rc.d tomcat6 defaults 99
+
+We have not finished yet, we need to patch default ''sermyadmin.sql'' with the patch attached here. Download the attachment, copy/upload it to your OpenSIPS server where you want to install this SerMyAdmin, copy it to /root/src/opensips/sermyadmin-install, and then run below commands.
+ cd /root/src/opensips/sermyadmin-install
+ patch < sermyadmin-sql.patch
+ mysql -uroot -p opensips < sermyadmin.sql
+
+== Post Install ==
+
+Continue with below steps after installation whether you were choosing choice 1 or 2.
+
+Make some adjustment to suit our installation. SerMyAdmin requires opensipsctl, opensips and PID file in certain location:
+ ln -s /usr/local/sbin/opensipsctl /usr/bin/
+ ln -s /usr/local/sbin/opensips /usr/bin/
+ ln -s /var/run/opensips/opensips.pid /var/run/opensips.pid
+
+Continue to configure database setup, edit context.xml and update with correct database name, host, user and password.
+ vi /usr/local/tomcat6/conf/context.xml
+
+Example of context.xml:
+
+ <?xml version="1.0" encoding="UTF-8"?><Context path="/sermyadmin">
+ <Resource auth="Container" driverClassName="com.mysql.jdbc.Driver" maxActive="20" maxIdle="10"
+ maxWait="-1" name="jdbc/openser_MySQL" type="javax.sql.DataSource" 
+ url="jdbc:mysql://localhost:3306/opensips" username="root" password="pwd"/></Context>
+
+Run tomcat6:
+ /etc/init.d/tomcat6 start
+
+Browse: http://<your SerMyAdmin server IP>:8080/sermyadmin
+
+Login with default username '''admin@sermyadmin.org''' and password is '''secret'''.
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

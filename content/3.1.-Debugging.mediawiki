@@ -1,0 +1,71 @@
+== Preface ==
+It is best to view several debugging options before we get started going deeper.
+
+When something goes wrong or simply you want to know whats going on you can use these tools to debug OpenSIPS:
+* Use osipsconsole or opensipsctl
+* Read log file
+* Use ngrep
+
+== 1. Use osipsconsole or opensipsctl ==
+
+'''osipsconsole''' give us a console with prompt where we can execute multiple commands at one session.
+
+In order to get osipsconsole to also capable of starting or stopping OpenSIPS we need to edit osipsconsole config file /usr/local/etc/opensips/osipsconsolerc:
+ vi /usr/local/etc/opensips/osipsconsolerc
+
+Change ''PID_FILE=/var/run/opensips.pid'' to ''PID_FILE=/var/run/opensips/opensips.pid''. If that option commented we should also remove the comment mark (# mark).
+
+Run osipsconsole, type quit to exit:
+ osipsconsole
+
+'''opensipsctl''' is a management tool where we can execute single command and then exit to original console (Linux CLI). opensipsctl is a handy tool to use in external scripts such as a bash or PHP script.
+
+Just like for osipsconsole, for opensipsctl we also need to update PID_FILE location to a correct location. The config file is in /usr/local/etc/opensips/opensipsctlrc:
+ vi /usr/local/etc/opensips/opensipsctlrc
+
+Change ''PID_FILE=/var/run/opensips.pid'' to ''PID_FILE=/var/run/opensips/opensips.pid''. If that option commented we should also remove the comment mark (# mark).
+
+Running opensipsctl:
+ opensipsctl online
+ opensipsctl ul show
+
+== 2. Read log file ==
+
+OpenSIPS use syslog facilities to log activities. Default OpenSIPS log file is /var/log/syslog. Example of examining OpenSIPS activities in /var/log/syslog:
+ tail -f /var/log/syslog
+ tail -f /var/log/syslog -n100
+ tail -f /var/log/syslog -n0 | tee log1.txt
+
+Change syslog configuration file to also copy log activities to our own file, for example to /var/log/opensips.log.
+ echo "local0.*   -/var/log/opensips.log" > /etc/rsyslog.d/99-opensips.conf
+ /etc/init.d/rsyslog restart
+
+Capture activities in /var/log/opensips.log:
+ tail -f /var/log/opensips.log
+ tail -f /var/log/opensips.log -n100
+ tail -f /var/log/opensips.log -n0 | tee log1.txt
+
+== 3. Use ngrep ==
+
+Many other tools we can use to capture SIP traffics, but ngrep is relatively easy to use.
+
+Install ngrep in OpenSIPS server:
+ apt-get install ngrep
+
+Use ngrep to capture SIP traffics:
+ ngrep -p -q -W byline -d eth1 port 5060
+
+In above example ngrep will capture any activities on port 5060 for both UDP and TCP on device eth1.
+
+We can also save the capture for later reading in siplog1.txt:
+ ngrep -p -q -W byline -d eth1 port 5060 > siplog1.txt
+
+This is an example if you need to tap for specific target:
+ ngrep -p -q -W byline udp port 5060 and src 192.168.56.77
+
+In above example ngrep will capture any activities on UDP port 5060, in any device and only if they're coming from source IP 192.168.56.77
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

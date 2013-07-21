@@ -1,0 +1,74 @@
+Chosen database is MySQL for simplicity and ease of use.
+The database name in this exercise is 'opensips', I recommend to just leave it like that.
+If you change the database name then be sure to change all database name on all config files.
+
+Create a database for OpenSIPS:
+ cd /usr/local/etc/opensips
+ opensipsdbctl create opensips
+
+Compile extra module ''auth_db'':
+ cd /root/src/opensips/opensips-1.9.1-tls/
+ TLS=1 make include_modules="auth_db" install
+
+Note:
+
+Do not forget to prefix with '''TLS=1''' on all make commands.
+
+Verify our newly compiled modules are installed:
+ ls -l /usr/local/lib/opensips/modules | grep auth_db
+
+Load db_mysql.so and auth_db.so. Edit opensips.cfg and then add below lines in '''Modules Section''':
+
+ #### MySQL module
+ loadmodule "db_mysql.so"
+ 
+ #### Auth db module
+ loadmodule "auth_db.so"
+ modparam("auth_db", "calculate_ha1", yes)
+ modparam("auth_db", "password_column", "password")
+ modparam("auth_db", "use_domain", 1)
+ modparam("auth_db", "db_url", "mysql://root:pwd@localhost/opensips")
+
+Please note on the ''db_url'' module parameter above, the format is:
+
+ <db engine>://<db user>:<db password>@<db host>/<OpenSIPS db name>
+
+Add this code snippet in '''Routing Logic''' right inside a block handling SIP REGISTER:
+
+ if (!www_authorize("", "subscriber")) {
+         www_challenge("", "0");
+         exit;
+ }
+ if (!db_check_to()) {
+         sl_send_reply("403","Forbidden");
+ }
+
+Example use in '''Routing Logic''':
+
+ # if SIP REGISTER
+ if (is_method("REGISTER")) {
+         if (!www_authorize("", "subscriber")) {
+                 www_challenge("", "0");
+                 exit;
+         }
+         if (!db_check_to()) {
+                 sl_send_reply("403","Forbidden");
+         }
+         if (!save("location")) {
+                 sl_reply_error();
+         }
+         exit;
+ }
+
+Verify opensips.cfg before starting or restarting opensips:
+ opensips -c
+
+Restart OpenSIPS:
+ /etc/init.d/opensips.init restart
+
+Try to register from SIP UA. Your SIP UA should prompt for username and password.
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

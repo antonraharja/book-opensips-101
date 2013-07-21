@@ -1,0 +1,17 @@
+Using default configuration you will have OpenSIPS with no authentication, so it is not secure and should be use only for learning. Other than that your OpenSIPS is a fully working SIP proxy.
+
+We can use a SIP softphone on your desktop to test whether or not OpenSIPS is running and handling SIP user agents such as our SIP softphone. Configure the softphone with any username and password, and set hostname or server IP to '''192.168.56.45''' (remember in this exercise this is our OpenSIPS IP address).
+
+You can use Ekiga, Linphone, Minisip or Twinkle. Install Twinkle on desktop (not in OpenSIPS server):
+ apt-get install twinkle
+
+Run Twinkle by clicking its icon.
+
+If you are on Windows or Mac laptop/PC, you can install X-Lite, MicroSIP or Blink.
+
+I believe Twinkle or X-Lite is easy enough to use and self-explanatory. One thing to remember is on every SIP UAC (User Agent Client), you need to fill username, password and SIP server IP.
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

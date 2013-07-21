@@ -1,0 +1,47 @@
+A subscriber may have multiple alias, for example 111@192.168.56.45 may have alias anton@192.168.56.45 and support@192.168.56.45.
+
+Just like subscriber location (usrloc), alias should also be saved in database.
+
+Compile and install alias_db module:
+ cd /root/src/opensips/opensips-1.9.1-tls/
+ TLS=1 make include_modules="alias_db" install
+
+Verify:
+ ls -l /usr/local/lib/opensips/modules | grep alias_db
+
+Update opensips.cfg and add below lines anywhere in '''Modules Section''':
+
+ #### Alias db module
+ loadmodule "alias_db.so"
+ modparam("alias_db", "db_url", "mysql://root:pwd@localhost/opensips")
+
+Add below script command somewhere in '''Routing Logic''' to get aliasing work. You may add it just above ''lookup("location", "m")''.
+ alias_db_lookup("dbaliases");
+
+Example use in '''Routing Logic''':
+ alias_db_lookup("dbaliases");
+ if (!lookup("location","m")) {
+         t_newtran();
+         t_reply("404", "Not Found");
+         exit;
+ }
+
+Verify opensips.cfg before starting or restarting OpenSIPS:
+ opensips -c
+
+Restart OpenSIPS:
+ /etc/init.d/opensips.init restart
+
+Manage aliases:
+ opensipsctl alias_db
+
+Adding/removing alias:
+ opensipsctl alias_db add anton@192.168.56.45 801@192.168.56.45
+ opensipsctl alias_db rm anton@192.168.56.45
+ opensipsctl alias_db list
+ opensipsctl alias_db show
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

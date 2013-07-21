@@ -1,0 +1,22 @@
+Our subscribers will have problem connecting to OpenSIPS when they are registering and calling from a network behind a NAT router.
+
+NAT is done on router when a local/private network need to connect or accept connection to/from public network such as Internet. 
+
+Imagine a call flow without OpenSIPS doing anything about NAT:
+* User A is in the office, behind NAT router
+* User B is outside, also behind NAT router, but in different location
+* OpenSIPS is installed in a data center and using public IP
+* User A makes a call to user B through OpenSIPS
+* OpenSIPS will receive a SIP INVITE from user A with IP private of user A on all over its SIP INVITE
+* OpenSIPS will reply with an OK or Proxy Authentication request. Here is the problem, since all IP in the SIP INVITE is local IP of user A, OpenSIPS will send the reply back to that local IP
+* No call received by user B and most likely a request timeout received by user A
+
+Install rtpproxy:
+ apt-get install rtpproxy
+
+To be continue..
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

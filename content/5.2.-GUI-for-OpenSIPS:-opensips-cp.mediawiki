@@ -1,0 +1,44 @@
+Alternative to SerMyAdmin, more into admin tools rather than user management, is opensips-cp, OpenSIPS Control Panel.
+
+OpenSIPS Control Panel offers management to multiple OpenSIPS servers.
+
+URL: http://opensips-cp.sourceforge.net
+
+Download and extract opensips-cp:
+ cd /root/src/opensips
+ wget -c "http://downloads.sourceforge.net/project/opensips-cp/opensips-cp/5.0/opensips-cp_5.0.tgz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fopensips-cp%2Ffiles%2Fopensips-cp%2F5.0%2F&ts=1371700243&use_mirror=nchc" -O opensips-cp_5.0.tgz
+ tar -zxf opensip-cp_5.0.tgz
+ ls
+
+Prepare server, we need to install LAMP (assumed we are using local MySQL server):
+ apt-get install apache2 php5 php5-cli php5-mysql php5-xmlrpc php-pear php-mdb2-driver-mysql php-log
+ /etc/init.d/apache2 restart
+
+Copy web files to web directory:
+ cd /root/src/opensips/5.0
+ mkdir -p /var/www/cp
+ cp -rR web config /var/www/cp/
+ chown www-data:www-data -R /var/www/cp
+
+Setup database for opensips-cp:
+ cd /root/src/opensips/5.0
+ mysql -uroot -p opensips < config/tools/admin/add_admin/ocp_admin_privileges.mysql
+ echo "INSERT INTO ocp_admin_privileges (username,password,ha1,available_tools,permissions) values ('admin','admin',md5('admin:admin'),'all','all');" | mysql -uroot -p opensips
+
+Update db.inc.php to suit your database server setups:
+ vi /var/www/cp/config/db.inc.php
+
+By default opensips-cp will save subscriber password in plain text, we have to change this. What we want is the password not in plain text format. Edit ''local.inc.php'' and update value of ''$config->passwd_mode'' from 0 to 1. Value 1 will make opensips-cp calculate hash ha1 and ha1b, and save it in database.
+ vi /var/www/cp/config/tools/users/user_management/local.inc.php
+
+More configurations are stored in every "inc" files in /var/www/cp/config and its sub-directories. We might need to edit ''boxes.global.inc.php'' to suit our server installations:
+ vi /var/www/cp/config/boxes.global.inc.php
+
+Browse: http://'''your_opensips-cp_server_IP'''/cp/web/
+
+Login with default user '''admin''' and password is '''admin'''.
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

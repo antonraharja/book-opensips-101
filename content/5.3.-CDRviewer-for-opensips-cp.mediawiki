@@ -1,0 +1,52 @@
+First step is to download attached file from master repo:<br>
+https://github.com/antonraharja/book-opensips-101/tree/master/attached-files/5.3
+
+Save those files locally and then upload them to your opensips-cp server. Put in /var/www/cp/config/tools/system/cdrviewer/ to replace existing files.
+
+For example we uploaded those files to home directory /home/anton:
+
+ cd /home/anton
+ ls -l local* *.mysql
+ cp local.inc.php cdrs.mysql opensips_cdrs.mysql /var/www/cp/config/tools/system/cdrviewer/
+
+Please note that attached files are modified from opensips-cp original files, added to them a way to save src_uri and dst_uri from acc table, thus making current opensips-cp capable of displaying Source and Destination.
+
+Setup database for CDRviewer:
+
+ cd /var/www/cp/config/tools/system/cdrviewer/
+ mysql -uroot -p opensips < cdrs.mysql
+ mysql -uroot -p opensips < opensips_cdrs.mysql
+
+Create this directory for cron job script to dump the file:
+
+ mkdir -p /var/lib/opensips_cdrs
+
+Setup cron job scripts for opensips-cp, including the one to generate CDRs:
+
+ cd /root/src/opensips/5.0/cron_job
+ cp generate-cdrs_mysql.sh /usr/local/sbin/
+
+Edit ''generate-cdrs_mysql.sh'', update database options according to our database server setups. While doing this you need to also make sure that the mysql command line in that file is like this:
+
+ mysql -h $HOSTNAME -u $USER -p$PASS -e "call opensips_cdrs(); " $DATABASE
+
+Please note the stored procedure name, it must be ''opensips_cdrs()'', change it if its not:
+
+ vi /usr/local/sbin/generate-cdrs_mysql.sh
+
+Update cron and insert generate-cdrs_mysql.sh:
+
+ crontab -e
+
+Fill cron file with this:
+
+ */15 * * * * /usr/local/sbin/generate-cdrs_mysql.sh
+
+Above example will get ''generate-cdrs_mysql.sh'' to run every 15 minutes.
+
+Login to opensips-cp web GUI and view CDRviewer menu in System tab.
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

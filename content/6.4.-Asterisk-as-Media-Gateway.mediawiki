@@ -1,0 +1,20 @@
+OpenSIPS by design is not allowed to alter media at all.
+Therefore we need a media gateway should we want to route our subscriber calls to other network such as PSTN, vice versa.
+
+The topology is relatively simple. We have OpenSIPS controlling SIP messages and media gateway to control media, audio and/or video.
+
+For this exercise we will use [http://www.asterisk.org/ Asterisk].
+
+Install Asterisk on the same server as OpenSIPS:
+
+ apt-get install asterisk
+
+Please note that both OpenSIPS and Asterisk will occupy the same UDP port 5060. We need to change this, we need to configure in such a way that
+OpenSIPS will stay in default port 5060 and Asterisk in another port, for example 5090.
+
+To be continue..
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

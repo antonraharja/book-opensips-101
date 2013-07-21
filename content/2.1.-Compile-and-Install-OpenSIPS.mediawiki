@@ -1,0 +1,69 @@
+== Preperations ==
+
+I'm using '''Ubuntu server 12.04.1 LTS''' for this exercise.
+
+I believe these instructions will also be applied to other Ubuntu versions or even most Debian based distro.
+
+Lab requirements:
+* PC with networking, and even better with internet
+* This PC also need to be able to fire up Virtualbox and actually run an Ubuntu server on top of Virtualbox with decent performance
+* In this notebook I'm using a laptop with Ubuntu desktop 13.04 on it and Virtualbox that came with the distro
+* My laptop IP would be 192.168.56.1 (default vboxnet0 device)
+* My Virtualbox IP (with Ubuntu and opensips on it) would be '''192.168.56.45'''
+
+Source files:
+* OpenSIPS 1.9.1 http://opensips.org/pub/opensips/1.9.1/src/opensips-1.9.1_src.tar.gz
+
+== Step 1: Preparations ==
+
+Install development packages:
+ apt-get update
+ apt-get upgrade
+ apt-get install build-essential flex bison zlib1g-dev libncurses5-dev libssl-dev libfrontier-rpc-perl libmysqlclient-dev pkg-config
+ mkdir -p /root/src/opensips
+
+Note:
+
+The apt-get upgrade is not necessary. But it is considered a good habit to always get your OS up-to-date.
+
+But if you do apt-get upgrade and it looks like the process is also upgrading the kernel, then you should restart your Ubuntu to get that new kernel up and running.
+
+Also note that those dependencies are for this lab purposes, in real situation you should only install what you need. For example mysql-server, if you already have one installed in other machine, you can use it instead if you want to.
+
+For this exercise I recommend that you install MySQL server now:
+ apt-get install mysql-server
+
+== Step 2: Compile and install OpenSIPS ==
+
+Execute below commands correctly to compile and install opensips:
+ cd /root/src/opensips/
+ wget -c http://opensips.org/pub/opensips/1.9.1/src/opensips-1.9.1_src.tar.gz
+ tar -zxf opensips-1.9.1_src.tar.gz
+ cd opensips-1.9.1-tls
+ TLS=1 make
+ TLS=1 make include_modules="db_mysql" modules
+ TLS=1 make include_modules="db_mysql" install
+
+Note:
+
+Extra modules such as db_mysql or dialplan by default are not compiled and installed. We need to use ''include_modules'' on make command to compile and install them.
+
+Do not forget to always put '''TLS=1''' in front of every make commands.
+
+When all dependencies have been fulfilled and all commands executed correctly then we will have OpenSIPS with TLS supports.
+
+== Step 3: Verify installation ==
+
+Please verify that rtpproxy binary is exists in /usr/local/bin:
+ ls -l /usr/local/bin/
+
+Please verify that opensips binaries are exists in /usr/local/sbin, we should see opensips* and osip* binary files:
+ ls -l /usr/local/sbin/
+
+We also need to make sure that all default and required extra modules are copied to OpenSIPS module directory:
+ ls -l /usr/local/lib/opensips/modules/
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

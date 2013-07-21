@@ -1,0 +1,30 @@
+After we implement ''www_authorize()'' we shall use username and password to login from SIP UA to OpenSIPS.
+
+We will use ''opensipsctl'' to manage subscribers:
+ opensipsctl add
+
+Add and remove subscriber from database:
+ opensipsctl add 101 112233
+ opensipsctl add 102 pwd#$
+ opensipsctl add 103 verysecretpassword
+ opensipsctl add 104 pwd4l4yg4mp4ngk3b4c4
+ opensipsctl rm 103
+
+Verify new subscribers have been added to database:
+ opensipsctl db show subscriber
+
+''ha1'' and ''ha1b'' are fields containing md5 hash of username, domain and password.
+
+ha1 format is:
+ md5(<username>:<domain>:<password>)
+
+ha1b format is
+ md5(<username@domain>:<domain>:<password>)
+
+We don't need to restart OpenSIPS whenever we add or remove subscribers.
+''opensipsctl'' will save subscribers to database and OpenSIPS will read them from database.
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

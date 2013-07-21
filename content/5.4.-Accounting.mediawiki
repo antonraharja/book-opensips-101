@@ -1,0 +1,49 @@
+Accounting is done by module acc. It is compiled and configured by default.
+
+In order to make the accounting process saves data to database we need to activate several parameters for module acc in opensips.cfg.
+
+Edit opensips.cfg and locate '''ACCounting module''' in '''Modules Section''', and then add these lines:
+ modparam("acc", "log_extra", "src_uri=$fU;caller_domain=$fd;dst_uri=$rU;callee_domain=$rd")
+ modparam("acc", "db_extra", "src_uri=$fU;caller_domain=$fd;dst_uri=$rU;callee_domain=$rd")
+ modparam("acc", "db_flag", "ACC_DO")
+ modparam("acc", "db_missed_flag", "ACC_MISSED")
+ modparam("acc", "db_url", "mysql://root:pwd@localhost/opensips")
+
+Example of full acc module loading and parameters:
+
+ #### ACCounting module
+ loadmodule "acc.so"
+ modparam("acc", "early_media", 0)
+ modparam("acc", "report_cancels", 0)
+ modparam("acc", "detect_direction", 0)
+ modparam("acc", "failed_transaction_flag", "ACC_FAILED")
+ modparam("acc", "log_flag", "ACC_DO")
+ modparam("acc", "log_missed_flag", "ACC_MISSED")
+ modparam("acc", "log_extra", "src_uri=$fU;caller_domain=$fd;dst_uri=$rU;callee_domain=$rd")
+ modparam("acc", "db_extra", "src_uri=$fU;caller_domain=$fd;dst_uri=$rU;callee_domain=$rd")
+ modparam("acc", "db_flag", "ACC_DO")
+ modparam("acc", "db_missed_flag", "ACC_MISSED")
+ modparam("acc", "db_url", "mysql://root:pwd@localhost/opensips")
+
+Next we need to modify routing block to use acc flags above. For example in the event of SIP INVITE we need to setflag(ACC_DO) so that the module will start accounting, saving data to database. Another example is when SIP messages reaching codes to handle SIP BYE then we need to setflag(ACC_DO) and setflag(ACC_FAILED) so that acc module can react appropriately, that is to save normal BYE data or mark it failed.
+
+Example code snippet:
+ if (is_method("INVITE")) {
+         setflag(ACC_DO);
+ }
+
+Verify opensips.cfg before starting or re-starting OpenSIPS:
+ opensips -c
+
+Restart OpenSIPS:
+ /etc/init.d/opensips.init restart
+
+Make some calls and then view the accounting results in database:
+ opensipsctl db show acc
+
+You may also use SerMyAdmin and opensips-cp to view accounting results.
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

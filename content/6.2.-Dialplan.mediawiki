@@ -1,0 +1,71 @@
+Dialplan module will lookup rules in database and replace matched strings if found.
+
+Steps to install dialplan module:
+ apt-get install libpcre3-dev
+ cd /root/src/opensips/opensips-1.9.1-tls/
+ TLS=1 make include_modules="dialplan" modules
+ TLS=1 make include_modules="dialplan" install
+
+Remember to always make sure that we prefixed all make commands with '''TLS=1'''.
+
+Configure opensips.cfg to use dialplan module, add these lines in "Modules Sections":
+
+ #### Dialplan module
+ loadmodule "dialplan.so"
+ modparam("dialplan", "db_url", "mysql://root:pwd@localhost/opensips")
+
+Always verify opensips.cfg before starting or re-starting OpenSIPS:
+ opensips -c
+
+Restart OpenSIPS:
+ /etc/init.d/opensips.init restart
+
+Exported and used function in dialplan module is:
+ dp_translate()
+
+Update default database structure:
+ mysql -uroot -p opensips -e "ALTER TABLE dialplan ADD match_len INT(11) AFTER subst_exp;"
+
+View dialplans in database:
+ opensipsctl dialplan show
+
+Add an example dialplan rule to database:
+ opensipsctl dialplan addrule 0 1 regexp '^9[2-9].*' 0 '^9([2-9].*)' '\1' asterisk
+
+Above rule will match for calls with 9 followed by numbers and then replace it with 9 being removed.
+Put it simple, user dialed 90810123456 will be replaced with 0810123456.
+
+More example:
+ opensipsctl dialplan addrule 0 1 regexp '^9[2-9].*' 0 '^9([2-9].*)' 'sip:\\1@voiprakyat.or.id' trunk
+
+Above rule will match for calls with 9 followed by numbers and then replace it with 9 being removed but now in SIP URI format.
+Put it simple, user dialed 90810123456 will be replaced with sip:0810123456@voiprakyat.or.id.
+
+
+Use of dialplan module in '''Route Logic''':
+
+ alias_db_lookup("dbaliases");
+ 
+ xlog("START OF DIALPLAN  LOGIC);
+ # take $rU, match with regexp in db, if found save it in $ru
+ # note the different between $rU and $ru (google it)
+ if (dp_translate("0", "$rU/$ru")) {
+         $var(dp) = 1;
+ }
+ if (!is_uri_host_local() || $var(dp)==1) {
+         route(relay);
+ }
+ log("END OF DIALPLAN LOGIC");
+ 
+ if (!lookup("location","m")) {
+         t_newtran();
+         t_reply("404", "Not Found");
+         exit;
+ }
+
+Above dialplan code, along with the dialplan rule added, will match with Request URI containing username or number to dial ($rU) 920001 and then substitute the whole request URI ($ru) to sip:20001@voiprakyat.or.id.
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

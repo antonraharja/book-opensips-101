@@ -1,0 +1,35 @@
+OpenSIPS provides a handy tool to work with database. This tool include tasks such as creating, dropping, migrating, copying and database backup restore:
+ opensipsdbctl
+
+Config file for opensipsdbctl is /usr/local/etc/opensips/opensipsctlrc, the same config file used by opensipsctl.
+Edit the file, remove comment mark and fill with correct values on options related to database.
+
+Remove comment mark and edit below options on opensipsctlrc:
+* DBENGINE
+* DBHOST
+* DBNAME
+* DBRWUSER
+* DBRWPW
+* DBROOTUSER
+
+Follow below extra steps to get opensipsdbctl usable. Copy missing OpenSIPS mysql related files from source:
+ cd /root/src/opensips/opensips-1.9.1-tls/scripts/
+ cp opensipsdbctl.mysql /usr/local/lib/opensips/opensipsctl/
+ cp -rR mysql /usr/local/etc/opensips/
+
+Running opensipsdbctl must be from within /usr/local/etc/opensips (or from where you copy OpenSIPS mysql files):
+ cd /usr/local/etc/opensips/
+ opensipsdbctl
+
+Example of using opensipsdbctl to create or drop database for OpenSIPS:
+ cd /usr/local/etc/opensips/
+ opensipsdbctl create opensips
+ opensipsdbctl drop opensips
+
+Note:
+Just use database name 'opensips' for OpenSIPS. If you change the name then you need to change configurations as well.
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

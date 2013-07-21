@@ -1,0 +1,97 @@
+Config file: /usr/local/etc/opensips/opensips.cfg
+
+Config structure:
+* Global Parameters
+* Modules Section
+* Routing Logic
+
+'''Global Parameters''' holds fundamental OpenSIP operation such as IP addresses, forking and logging options.
+
+'''Modules Section''' is a block where we define which module will be loaded and what are their parameters.
+
+'''Routing Logic''' is where script how every single SIP requests and responses treatedby OpenSIPS.
+
+Example of a basic config file /usr/local/etc/opensips/opensips.cfg:
+ 
+ ############### Global Parameters ###############
+ 
+ debug=3
+ log_stderror=no
+ log_facility=LOG_LOCAL0
+ fork=yes
+ children=4
+ auto_aliases=no
+ listen=udp:192.168.56.45:5060
+ disable_tcp=yes
+ disable_tls=yes
+ 
+ 
+ 
+ ############### Modules Section ###############
+ 
+ mpath="/usr/local/lib/opensips/modules/"
+ 
+ #### SIGNALING module
+ loadmodule "signaling.so"
+ 
+ #### StateLess module
+ loadmodule "sl.so"
+ 
+ #### Transaction Module
+ loadmodule "tm.so"
+ modparam("tm", "fr_timer", 5)
+ modparam("tm", "fr_inv_timer", 30)
+ modparam("tm", "restart_fr_on_each_reply", 0)
+ modparam("tm", "onreply_avp_mode", 1)
+ 
+ #### Record Route Module
+ loadmodule "rr.so"
+ /* do not append from tag to the RR (no need for this script) */
+ modparam("rr", "append_fromtag", 0)
+ 
+ #### FIFO Management Interface
+ loadmodule "mi_fifo.so"
+ modparam("mi_fifo", "fifo_name", "/tmp/opensips_fifo")
+ modparam("mi_fifo", "fifo_mode", 0666)
+ 
+ #### URI module
+ loadmodule "uri.so"
+ modparam("uri", "use_uri_table", 0)
+ 
+ #### USeR LOCation module
+ loadmodule "usrloc.so"
+ modparam("usrloc", "nat_bflag", "NAT")
+ modparam("usrloc", "db_mode",   0)
+ 
+ #### REGISTRAR module
+ loadmodule "registrar.so"
+ modparam("registrar", "tcp_persistent_flag", "TCP_PERSISTENT")
+ 
+ /* uncomment the next line not to allow more than 10 contacts per AOR */
+ #modparam("registrar", "max_contacts", 10)
+ 
+ 
+ 
+ ############### Routing Logic ###############
+ 
+ route {
+     xlog("Enter script");
+     if (is_method("REGISTER")) {
+         save("location");
+         exit;
+     }
+     if (is_method("INVITE")) {
+         route(relay);
+         exit;
+     }
+     xlog("Exit script");
+ }
+ 
+ route[relay] {
+     sl_send_reply("404", "Not found");
+ }
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

@@ -1,0 +1,68 @@
+Enable Access Control List (ACL) by activating a module called "group".
+
+This module serve a way to control "who can call where".
+
+Edit opensips.cfg and follow steps below.
+
+Add these lines in "Module Sections":
+ #### Group module
+ loadmodule "group.so"
+ modparam("group", "db_url", "mysql://root:pwd@localhost/opensips")
+
+Exported and used function:
+ db_is_user_in()
+
+Example to use it in routing block:
+ # handling dialplans from database
+ if (dp_translate("0", "$rU/$ru")) {
+         $var(dp) = 1;
+ }
+ if (!is_uri_host_local() || $var(dp)==1) {
+         xlog("ROUTE TO GATEWAY");
+         route(gateway);
+ }
+
+And at the bottom of the file add new subroute called ''gateway'':
+ route[gateway] {
+         if ($ru=~"^sip:08.*" || $ru=~"^sip:[2-9].*") {
+                 if (db_is_user_in("Credentials", "level_1")
+                      || db_is_user_in("Credentials", "level_2"))
+                      || db_is_user_in("Credentials", "level_3")) {
+                         xlog("ROUTE TO LOCAL");
+                         rewritehostport("192.168.56.75");
+                         route(relay);
+                 } else {
+                         sl_send_reply("403", "No permission for local or mobile");
+                         exit();
+                 }
+         }
+         if ($ru=~"^sip:0[2-7].*") {
+                 if (db_is_user_in("Credentials", "level_2")
+                      || db_is_user_in("Credentials", "level_3")) {
+                         xlog("ROUTE TO LONG DISTANCE");
+                         route(relay);
+                 } else {
+                         sl_send_reply("403", "No permission for long distance");
+                         exit();
+                 }
+         }
+         if ($ru=~"^sip:\+[1-9].*") {
+                 if (db_is_user_in("Credentials", "level_3")) {
+                         xlog("ROUTE TO INTERNATIONAL");
+                         route(relay);
+                 } else {
+                         sl_send_reply("403", "No permission for international");
+                         exit();
+                 }
+         }
+         xlog("ROUTE NO PERMISSIONS");
+         sl_send_reply("403", "Not enough permissions");
+         exit();
+ }
+
+Attached is a fully working opensips.cfg
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>

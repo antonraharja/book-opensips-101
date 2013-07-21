@@ -1,0 +1,54 @@
+OpenSIPS can easily be configured for multi-domain, meaning the same subscriber username may have different domain and actually different person or device.
+
+Add below lines on '''Modules Section''' to load domain module and set it to use database:
+ #### Domain module
+ loadmodule "domain.so"
+ modparam("domain", "db_url", "mysql://root:pwd@localhost/opensips")
+
+Update routing block to include script command ''is_from_local()'' and/or ''is_uri_host_local()'' whenever we need to make sure that the domain supplied are supported by our SIP server.
+
+Example use in '''Routing Logic''':
+ if (!(is_method("REGISTER"))) {
+         if (is_from_local()) {
+                 if (!proxy_authorize("", "subscriber")) {
+                         proxy_challenge("", "0");
+                         exit;
+                 }
+                 if (!db_check_from()) {
+                         sl_send_reply("403","Forbidden");
+                 }
+                 consume_credentials();
+         } else {
+                 if (!is_uri_host_local()) {
+                         send_reply("403","Relay forbidden");
+                         exit();
+                 }
+         }
+ }
+
+Verify opensips.cfg before starting or re-starting OpenSIPS:
+ opensips -c
+
+Restart OpenSIPS:
+ /etc/init.d/opensips.init restart
+
+Verify if domain module activated:
+ opensipsctl domain
+ opensipsctl domain showdb
+
+Adding/removing domain into/from database:
+ opensipsctl domain add voiprakyat.or.id
+ opensipsctl domain add briker.org
+ opensipsctl domain add playsms.org
+ opensipsctl domain rm playsms.org
+ opensipsctl domain showdb
+
+Adding/subscriber into/from database using domain:
+ opensipsctl add anton@voiprakyat.or.id rahasia
+ opensipsctl rm anton@voiprakyat.or.id
+ opensipsctl db show subscriber
+
+
+--<br>
+Anton Raharja<br>
+http://www.antonraharja.com<br>
