@@ -54,9 +54,6 @@ When all dependencies have been fulfilled and all commands executed correctly th
 
 == Step 3: Verify installation ==
 
-Please verify that rtpproxy binary is exists in /usr/local/bin:
- ls -l /usr/local/bin/
-
 Please verify that opensips binaries are exists in /usr/local/sbin, we should see opensips* and osip* binary files:
  ls -l /usr/local/sbin/
 
